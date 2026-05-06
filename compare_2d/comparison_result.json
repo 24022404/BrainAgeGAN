@@ -1,0 +1,11 @@
+{
+  "winner": "normalized",
+  "normalized": {
+    "best_loss_G": 0.69265006404174,
+    "ssim": 0.9870433034806871
+  },
+  "unnormalized": {
+    "best_loss_G": 0.6951876533658881,
+    "ssim": 0.9917968765714232
+  }
+}
