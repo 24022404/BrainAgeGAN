@@ -81,7 +81,7 @@ Simulating brain aging through MRI images using a GAN model, combining volume-pr
 ## Running on Kaggle
 
 1. Upload the dataset to Kaggle Datasets
-2. Run notebooks sequentially from `00a` through `09`
+2. Run notebooks sequentially from `01` through `09`
 3. Checkpoints are automatically saved to the Kaggle Dataset after each best epoch
 4. `03_compare` and `06_compare` automatically select the better model and save the result as JSON for downstream notebooks to read
 
