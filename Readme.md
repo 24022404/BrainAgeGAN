@@ -1,121 +1,95 @@
 # Latent Manipulation of Brain MRI using Volume-Preserving GANs
 
-## 📋 Phân công công việc
-
-Xem chi tiết phân công tại: [Google Docs](https://docs.google.com/document/d/1RU2WGWDfILGBAOdBGp-vDyFSmVqaHril0cuCsTkOCV8/edit?hl=vi&tab=t.0)
-
-# Latent Manipulation of Brain MRI using Volume-Preserving GANs
-
-Mô phỏng quá trình lão hóa não bộ bằng cách thao tác trên không gian tiềm ẩn (latent space) của GAN, trong khi giữ nguyên các đặc điểm giải phẫu.
+Mô phỏng quá trình lão hóa não bộ qua ảnh MRI bằng mô hình GAN, kết hợp kỹ thuật tiền xử lý bảo toàn thể tích não và thao túng không gian tiềm ẩn (latent space) theo thuộc tính tuổi.
 
 ---
 
-## Mô tả
+## Mục tiêu
 
-Dự án xây dựng mô hình GAN có khả năng:
-- Học phân phối ảnh MRI não theo tuổi
-- Thay đổi tuổi trong latent space → sinh ra ảnh não ở các mốc tuổi khác nhau
-- Giữ nguyên cấu trúc giải phẫu, chỉ thay đổi đặc điểm lão hóa
-
----
-
-## Dataset
-
-- **Nguồn:** Tổng hợp từ nhiều dataset mã nguồn mở (ABIDE, ADHD, ADNI, OpenNeuro,...)
-- **Số lượng:** ~12,499 subjects
-- **Định dạng:** NIfTI (`.nii.gz`), T1-weighted MRI
-- **Tuổi:** 5 – 97 tuổi
+- Phát triển mô hình GAN có khả năng thao túng latent space để mô phỏng các thay đổi não bộ theo tuổi
+- Áp dụng tiền xử lý bảo toàn thể tích não gốc (resample 1mm isotropic) trước khi huấn luyện
+- Thay đổi có hệ thống thuộc tính tuổi trong latent vector để khảo sát sự tiến hóa cấu trúc não theo thời gian, trong khi giữ nguyên các đặc trưng giải phẫu khác
 
 ---
 
-## Cấu trúc project
+## Cấu trúc thư mục
 
 ```
-├── 00a_preprocessing_2d.ipynb   # Raw MRI → PNG 2D (normalized + unnormalized)
-├── 00b_preprocessing_3d.ipynb   # Raw MRI → NIfTI 3D (normalized + unnormalized)
-├── 01_model2d_normalized.ipynb  # Train GAN 2D trên data normalized
-├── 02_model2d_unnormalized.ipynb# Train GAN 2D trên data unnormalized
-├── 03_compare_2d.ipynb          # So sánh 2 model 2D, chọn model tốt hơn
-├── 04_model3d_normalized.ipynb  # Train GAN 3D trên data normalized
-├── 05_model3d_unnormalized.ipynb# Train GAN 3D trên data unnormalized
-├── 06_compare_3d.ipynb          # So sánh 2 model 3D, chọn model tốt hơn
-├── 07_latent_manipulation.ipynb # Simulate aging với model tốt nhất
-└── 08_evaluation.ipynb          # Đánh giá hiệu suất toàn bộ pipeline
+📁 latent_examination_imgs/     # Kết quả phân tích latent space (PCA, correlation, activation map)
+📁 latent_manipulation_imgs/    # Kết quả thao túng latent space (conditional generation, latent direction)
+📁 models_eval_res/             # Kết quả đánh giá mô hình (SSIM, PSNR, VPS, comparison charts)
 ```
 
 ---
 
-## Pipeline
+## Danh sách Notebook
 
-```
-Raw .nii.gz
-    │
-    ├── 00a ──► PNG 2D (normalized / unnormalized)
-    │               │
-    │           01, 02 ──► GAN 2D × 2
-    │               │
-    │            03 ──► So sánh → chọn model 2D tốt nhất
-    │
-    ├── 00b ──► NIfTI 3D (normalized / unnormalized)
-    │               │
-    │           04, 05 ──► GAN 3D × 2
-    │               │
-    │            06 ──► So sánh → chọn model 3D tốt nhất
-    │
-    ├── 07 ──► Latent Manipulation (simulate aging)
-    └── 08 ──► Evaluation (SSIM, Loss_G)
-```
+| # | File | Mô tả |
+|---|------|--------|
+| 1 | `00a_preprocessing_2d.ipynb` | Tiền xử lý ảnh MRI 2D: conform, skull-stripping, resample 1mm, lưu axial slice PNG |
+| 2 | `00b_preprocessing_3d.ipynb` | Tiền xử lý ảnh MRI 3D: conform, skull-stripping, resample 1mm, lưu NIfTI |
+| 3 | `01_model2d_normalized.ipynb` | Huấn luyện GAN 2D trên dữ liệu đã normalized (WGAN-GP + L1 + age regression) |
+| 4 | `02_model2d_unnormalized.ipynb` | Huấn luyện GAN 2D trên dữ liệu chưa normalized |
+| 5 | `03_compare_2d_models.ipynb` | So sánh 2 model 2D, chọn model tốt hơn theo SSIM |
+| 6 | `04_model3d_normalized.ipynb` | Huấn luyện GAN 3D trên dữ liệu đã normalized |
+| 7 | `05_model3d_unnormalized.ipynb` | Huấn luyện GAN 3D trên dữ liệu chưa normalized |
+| 8 | `06_compare_3d_models.ipynb` | So sánh 2 model 3D, chọn model tốt hơn theo SSIM |
+| 9 | `07_latent_manipulation.ipynb` | Thao túng latent space: Conditional generation và Latent Direction manipulation |
+| 10 | `08_model_evaluation.ipynb` | Đánh giá toàn diện: SSIM, PSNR, VPS (Volume Preservation Score) |
+| 11 | `09_latent_examination.ipynb` | Phân tích latent space: PCA, correlation, activation map, per-dimension analysis |
 
 ---
 
-## Kiến trúc Model
+## Kiến trúc mô hình
 
-**Generator:** U-Net với Age Embedding inject vào bottleneck
-- 2D: `Conv2d`, input `(B, 1, 256, 256)`
-- 3D: `Conv3d`, input `(B, 1, 64, 64, 64)`
+**Generator** — U-Net encoder-decoder với age conditioning tại bottleneck:
+- Encoder: 8 layer (2D) / 4 layer (3D) với LeakyReLU
+- Age injection: `z = age_fuse(concat(e_bottleneck, age_feat))` — concat thay vì cộng để model tự học cân bằng giữa image features và age features
+- Decoder: skip connections từ encoder, BatchNorm + ReLU
 
-**Discriminator:** PatchGAN với Age Conditioning
-- Age được broadcast thành channel và concat vào input
+**Discriminator** — PatchGAN với age map concatenation
 
-**Loss Functions:**
-- `Adversarial loss` — đánh lừa Discriminator
-- `L1 loss` — giữ nguyên cấu trúc giải phẫu
-- `Age regression loss` — đảm bảo ảnh sinh ra đúng tuổi
-
----
-
-## Preprocessing
-
-Dùng **ANTsPy**:
-- `antspynet.brain_extraction()` — skull-stripping (loại bỏ hộp sọ)
-- `ants.resample_image()` — chuẩn hóa về 1mm isotropic (normalized output)
-
-**2 loại output:**
-- `normalized` — resample về 1mm isotropic, tất cả não cùng scale
-- `unnormalized` — giữ nguyên kích thước gốc
+**Loss function** — WGAN-GP + L1 reconstruction + age regression trên ảnh fake
 
 ---
 
 ## Metrics đánh giá
 
-| Metric | Mô tả |
-|--------|-------|
-| **SSIM** | Structural Similarity — độ giữ nguyên cấu trúc giải phẫu |
-| **Loss_G** | Generator loss — độ thuyết phục của ảnh sinh ra |
+| Metric | Ý nghĩa |
+|--------|---------|
+| **SSIM** | Structural Similarity — đo mức độ giữ nguyên cấu trúc giải phẫu não |
+| **PSNR** | Peak Signal-to-Noise Ratio — đo chất lượng pixel-level |
+| **VPS** | Volume Preservation Score — đo mức độ bảo toàn thể tích não (gần 1.0 = tốt) |
 
 ---
 
-## Môi trường
+## Dataset
 
-- **Platform:** Kaggle Notebooks (GPU T4)
-- **Python:** 3.10
-- **Thư viện chính:** PyTorch, ANTsPy, ANTsPyNet, nibabel, scikit-image
+Hơn 12000 ảnh MRI não open-source, xử lý qua pipeline: Conform → Skull-stripping → Alignment → Resample 1mm isotropic. Chia thành normalized (chuẩn hóa kích thước) và unnormalized để so sánh ảnh hưởng của tiền xử lý lên chất lượng GAN.
 
 ---
 
-## Cách chạy
+## Yêu cầu
 
-1. Upload dataset lên Kaggle
-2. Chạy lần lượt từ `00a` → `08`
-3. Mỗi file đọc output từ file trước làm input
-4. Kết quả cuối tại `evaluation/metrics_summary.json`
+- Python 3.10+
+- PyTorch 2.0+
+- nibabel, scikit-image, scikit-learn, matplotlib, pandas
+- Kaggle GPU (T4 hoặc P100) để huấn luyện
+
+---
+
+## Chạy trên Kaggle
+
+1. Upload dataset lên Kaggle Datasets
+2. Chạy lần lượt từ `00a` → `09` theo thứ tự
+3. Checkpoint được tự động lưu lên Kaggle Dataset sau mỗi epoch tốt nhất
+4. Các file `03_compare` và `06_compare` chọn tự động model tốt hơn và lưu kết quả JSON để các file sau đọc
+
+---
+
+## Kết quả
+
+| Model | SSIM |
+|-------|------|
+| GAN 2D Normalized | 0.9839 |
+| GAN 3D Normalized | 0.9907 |
